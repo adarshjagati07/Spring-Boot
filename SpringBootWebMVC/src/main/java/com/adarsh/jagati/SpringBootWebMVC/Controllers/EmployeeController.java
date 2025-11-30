@@ -1,32 +1,39 @@
 package com.adarsh.jagati.SpringBootWebMVC.Controllers;
 
 import com.adarsh.jagati.SpringBootWebMVC.DTO.EmployeeDTO;
+import com.adarsh.jagati.SpringBootWebMVC.Entities.EmployeeEntity;
+import com.adarsh.jagati.SpringBootWebMVC.Repositories.EmployeeRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/employee")
 public class EmployeeController {
 
-    @GetMapping(path = "/")
-    public String home(){
-        return "Hello from Adarsh! This is my very first spring REST API.";
+    private final EmployeeRepository employeeRepo;
+
+    //constructor dependency injection of employee repo
+    // (just for testing purpose here, otherwise all the repo and entity class will go to service layer only)
+    public EmployeeController(EmployeeRepository employeeRepo){
+        this.employeeRepo = employeeRepo;
     }
+
 
     @GetMapping(path = "/{employeeId}")
-    public EmployeeDTO getEmployeeById(@PathVariable Long employeeId){
-        return new EmployeeDTO(employeeId, "Adarsh", "adarsh@gmail.com",23, LocalDate.of(2025,11,23),true);
+    public EmployeeEntity getEmployeeById(@PathVariable(name = "employeeId") Long id){
+        return employeeRepo.findById(id).orElse(null);
     }
 
-    @GetMapping
-    public String getAllEmployees(@RequestParam(required = false) Integer age,@RequestParam(required = false) String sortby){
-        return "Hii employees of age: "+age+" Sort by: "+sortby;
+    @GetMapping(path = "/")
+    public List<EmployeeEntity> getAllEmployees(@RequestParam(required = false) Integer age,@RequestParam(required = false) String sortby){
+        return employeeRepo.findAll();
     }
 
     @PostMapping(path = "/create")
-    public EmployeeDTO createEmployee(@RequestBody EmployeeDTO inputEmployee){
-        inputEmployee.setId(13433L);
-        return inputEmployee;
+    public EmployeeEntity createEmployee(@RequestBody EmployeeEntity newEmployee){
+        return employeeRepo.save(newEmployee);
     }
 }

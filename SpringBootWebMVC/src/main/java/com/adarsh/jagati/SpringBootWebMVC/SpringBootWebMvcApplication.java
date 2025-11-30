@@ -8,7 +8,8 @@ public class SpringBootWebMvcApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SpringBootWebMvcApplication.class, args);
+        System.out.println("CWD = " + System.getProperty("user.dir"));
 
-	}
+    }
 
 }
