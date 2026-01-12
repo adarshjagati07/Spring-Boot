@@ -1,5 +1,6 @@
 package com.adarsh.jagati.SpringBootWebMVC.DTO;
 
+import com.adarsh.jagati.SpringBootWebMVC.Annotations.EmployeeRoleValidation;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -25,8 +26,13 @@ public class EmployeeDTO {
     private String email;
 
     @Positive(message = "Write valid age")
-    @Size(min = 5, max = 80, message = "give valid age, in range")
+    @Min(value = 18, message = "Age must be greater than 18")
+    @Max(value = 80, message = "Age must be less than 80")
     private Integer age;
+
+    @NotNull(message = "Role cannot be null")
+    @EmployeeRoleValidation
+    private String role;
 
     @PastOrPresent(message = "Give valid date of joining")
     private LocalDate dateOfJoining;
