@@ -1,6 +1,7 @@
 package com.adarsh.jagati.SpringBootWebMVC.Controllers;
 
 import com.adarsh.jagati.SpringBootWebMVC.DTO.EmployeeDTO;
+import com.adarsh.jagati.SpringBootWebMVC.Exceptions.ResourceNotFoundException;
 import com.adarsh.jagati.SpringBootWebMVC.Services.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
@@ -22,8 +24,9 @@ public class EmployeeController {
     }
 
     @GetMapping(path = "/")
-    public List<EmployeeDTO> getAllEmployees(){
-        return employeeService.getAllEmployees();
+    public ResponseEntity<List<EmployeeDTO>> getAllEmployees(){
+        List<EmployeeDTO> employees =  employeeService.getAllEmployees();
+        return ResponseEntity.ok(employees);
     }
 
     @GetMapping(path = "/{employeeId}")
@@ -31,8 +34,9 @@ public class EmployeeController {
         Optional<EmployeeDTO> employeeDTO = employeeService.getEmployeeById(id);
         return employeeDTO
                 .map(employeeDTO1 -> ResponseEntity.ok(employeeDTO1))
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(()-> new ResourceNotFoundException("Employee was Not Found"));
     }
+
 
     @PostMapping(path = "/create")
     public ResponseEntity<EmployeeDTO> createNewEmployee(@RequestBody @Valid EmployeeDTO newEmployee){
@@ -55,7 +59,7 @@ public class EmployeeController {
     public ResponseEntity<EmployeeDTO> updateEmployeePartially(@PathVariable(name = "employeeId") Long id, @RequestBody Map<String, Object>updates){
         EmployeeDTO emp =  employeeService.updateEmployeePartially(id, updates);
         if(emp == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            throw new ResourceNotFoundException("Employee not found!");
         }
         return new ResponseEntity<>(emp, HttpStatus.OK);
     }
